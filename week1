@@ -1,0 +1,227 @@
+#change working directory
+getwd()
+setwd("C:/Users/Lindsey/Documents/R/Coursera")
+dir()
+
+#write a little function
+myfunction <- function() {
+    x <- rnorm(100)
+    mean(x)
+}
+#call the function 
+myfunction()
+#lists what has been defined in console
+ls()
+dir()
+
+#create a second function
+second <- function(x) {
+  x + rnorm(length(x))
+}
+#x can be single number
+second(4)
+#or vector
+second(c(9, 12))
+# create a vector
+x <- vector("integer", length= 10)
+x
+# specify the mode (or type), logical, character, numeric, integer, complex
+# useful for dummy data. defaults to 0
+
+# create a matrix [rows, columns]
+y <- matrix(nrow = 2, ncol = 3)
+y 
+# defaults to NA
+dim(y)
+# gives dimensions 2 3 (row col)
+# matrices constructed by columns
+y <- matrix(1:6, nrow=2, ncol=3)
+y
+# create a matrix by defining the dimension attribute
+m <- 1:10
+dim(m) <- c(2,5) ## 2 rows 5 columns
+m
+# create a matrix by cbinding and rbinding
+x <- 1:3
+y <- 10:12
+cbind(x,y)
+rbind(x,y)
+
+# create a factor (self describing categorical data)
+x <- factor(c("yes", "yes", "no", "yes", "no"))
+x
+table(x) #frequency table of each level
+#unclass strips out the classification (yes, no) and
+#brings down to integer level
+unclass(x)
+x
+# you can tell R which level you want to come first - baseline level.
+# it is programmed to just do it alphabetically, but can be changed
+x <- factor(c("yes", "yes", "no", "yes", "no"), 
+            levels = c("yes", "no"))
+x
+
+#test for missing values
+x <- c(1, 2, NA, 10, 3)
+is.na(x) ## returns logical values of where NA is
+is.nan(x) ## all false becase NaN is not element in vector
+x <- c(1, 2, NaN, NA, 4)
+is.na(x) ## returns logical values of where NA *AND* NaN are
+is.nan(x) ## just shows where NaN is
+
+# define a dataframe... like a matrix, but columns can have different classes
+x <- data.frame(foo=1:4, bar=c(T,T,F,T))
+x ## will show table with headings foo, bar
+# gives row and column length
+nrow(x) #4
+ncol(x) #2
+# all r objects can have names.
+x<- 1:3
+names(x) #returns null because nothing defined by default
+names(x) <- c("foo", "bar", "norf")
+x ## shows table headings as defined
+# lists can have names for each element
+x <- list(a=1, b=2, c=3)
+x
+# matrices have a dimnames attribute to name the rows and columns
+m <- matrix(1:6, nrow=2, ncol=3)
+dimnames(m) <- list(c("a", "b"), c("c", "d", "e")) #remember rows, columns
+m
+
+# subsetting
+# single bracket use... returns same class of object as the original
+x <- c("a", "b", "c", "c", "d", "a")
+x[1] ## a
+x[2] ## b
+x[1:4] ## a b c c
+#numeric index (converts the letters to numbers)
+x[x > "a"] ## b c c d basically come after a (lexographical order)
+# use logical indexing...
+u <- x > "a"
+u # returns a logical vector where each element > a (f,t,t,t,t,f)
+x[u] # same as x[x > a] above
+
+#subsetting matrices
+m <- matrix(1:6, nrow=2, ncol=3)
+m[1,2] #first row, second column ##3
+m[2,1] #second row, first column ##2
+m[1, ] #first row ## 1 3 5
+m[ ,2] #second column ##3 4 
+# defaults to giving you a vector length 1 instead of matrix 
+# (like original object). turn off with drop =f
+m[1, ,  drop=FALSE] # gives first row as a matrix, not vector
+
+#subsetting lists
+#can use [] (will return another list) or [[]] (might return a vector or matrix)
+x <- list(foo=1:4, bar=0.6)
+x[1] #returns a list foo 1 to 4
+y <- x[[1]] # returns vector length 4
+length(y)
+#$ sign and name.  useful when you don't remember where the element is 
+#in the list
+x$bar ##0.6
+x[["bar"]] ##0.6
+x["bar"] ##list with element 0.6
+#cannot use [[]] or $ when you want to extract multiple elements of a list
+x <- list(foo=1:4, bar=0.6, baz="hello")
+x[c(1,3)] #returns foo and baz as elements in a list
+
+#when the subset is a computed result, use [[]]
+name <- "foo"
+x[[name]] ##1 2 3 4
+x$name ##null -- name doesn't exist
+x$foo ## 1 2 3 4 -- foo does exist
+#can subset nested elements of a list
+x <- list(a=list(10,12,14), b=c(3.14, 2.81))
+#first element of list x is another list. we can reference a nested element
+x[[c(1,3)]] #first element of x, third element of a ##14
+
+y <- list(a=list(10,list(1,3),14),b=c(3.14,2.81))
+y[[c(1,2,2)]] ##3
+
+x[[c(2,1)]] ##3.14
+
+#partial matching.
+#dont always have to type name in full
+x <- list(aardvark=1:5)
+x$a #can partially match using $sign ##1 2 3 4 5 
+x[["a"]] #cant partialy match using [[]] ##null
+x[["a", exact=FALSE]] #...unless... force it to look for partial matches
+
+#remove missing values
+x <- c(1,2,NA,4,NA,5)
+#create logical vector of bad data where na is true
+bad <- is.na(x)
+#so to get good data we need to negate this logical vector
+x[!bad]
+#multiple objects get non missng
+y <- c("a","b",NA,"d",NA,"f")
+#complete.cases gives logical vector where both/all elements are non missing
+good <- complete.cases(x,y)
+good ## t t f t f t
+x[good] #gives non missing
+y[good] #gives non missing
+# print whole dataset airquality
+airquality
+airquality[1:6,] #just print first 6 rows
+#contains some missing values. just print non missing data
+good <- complete.cases(airquality)
+airquality[good, ][1:6, ] #first subset only complete cases, then first 6 rows
+
+#textual files
+#reconstruct a file using meta data
+y <- data.frame(a=1, b="a")
+dput(y)
+#save it to a file in default directory
+dput(y, file="y.R")
+new.y <- dget("y.R")
+new.y
+#use dump and source for multiple objects
+x <- "foo"
+y <- data.frame(a=1, b="a")
+#write x and y to saved file
+dump(c("x","y"), file="data.R")
+rm(x,y) #remove from environment
+#call them back to consol
+source("data.R")
+y
+x
+#read from a webpage
+con <- url("http://cran.r-project.org","r") # r means readonly
+x <- readLines(con) #reads the html on the page
+head(x)
+
+x <- c(4, "a", T)
+x <- 1:4
+y <- 2:3
+x+y
+x <- c(17, 14, 4, 5, 13, 12, 10)
+x[x>=11] <- 4
+x
+
+x <- read.table(file="hw1_data.csv", sep=",", header=T)
+x[152:153,]
+x[47,1]
+bad <- is.na(x[,1])
+bad2 <-bad[bad==T]
+good <- x[,1][!bad]
+mean(good)
+
+ozone <- x$Ozone >31
+x2 <-x[ozone,]
+
+temp <- x2$Temp >90
+x3 <-x2[temp,]
+bad <- is.na(x3[,2])
+solar <- x3[,2][!bad]
+mean(solar)
+
+six <- x[,5] ==6
+y <- x[six,]
+mean(y$Temp)
+
+five <- x[,5] == 5
+y <- x[five,]
+yy <- is.na(y$Ozone)
+yyy <- y[!yy,]
+max(yyy$Ozone)
